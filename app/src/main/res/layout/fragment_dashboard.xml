@@ -6,6 +6,22 @@
     android:layout_height="match_parent"
     tools:context=".ui.dashboard.DashboardFragment">
 
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="410dp"
+        android:layout_height="60dp"
+        android:text="Upload Picture of Food Item"
+        tools:layout_editor_absoluteX="2dp"
+        tools:layout_editor_absoluteY="129dp" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="410dp"
+        android:layout_height="52dp"
+        android:text="Enter Name of Food Item"
+        tools:layout_editor_absoluteX="-1dp"
+        tools:layout_editor_absoluteY="186dp" />
+
     <TextView
         android:id="@+id/text_dashboard"
         android:layout_width="match_parent"
@@ -23,4 +39,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.034" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="404dp"
+        android:layout_height="57dp"
+        android:text="Take Picture of Food Item"
+        tools:layout_editor_absoluteX="3dp"
+        tools:layout_editor_absoluteY="72dp" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cameraButton" />
 </androidx.constraintlayout.widget.ConstraintLayout>
