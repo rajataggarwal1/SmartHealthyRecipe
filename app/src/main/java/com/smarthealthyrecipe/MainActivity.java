@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 }
         );
 
-        Button cameraButton = findViewById(R.id.button3);
+        Button cameraButton = findViewById(R.id.button2);
         cameraButton.setOnClickListener(v -> {
             Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             if (cameraIntent.resolveActivity(getPackageManager()) != null) {

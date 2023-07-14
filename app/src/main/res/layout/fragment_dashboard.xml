@@ -8,19 +8,19 @@
 
     <Button
         android:id="@+id/button3"
-        android:layout_width="410dp"
-        android:layout_height="60dp"
+        android:layout_width="350dp"
+        android:layout_height="46dp"
         android:text="Upload Picture of Food Item"
-        tools:layout_editor_absoluteX="2dp"
-        tools:layout_editor_absoluteY="129dp" />
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="128dp" />
 
     <Button
         android:id="@+id/button4"
-        android:layout_width="410dp"
-        android:layout_height="52dp"
+        android:layout_width="366dp"
+        android:layout_height="43dp"
         android:text="Enter Name of Food Item"
-        tools:layout_editor_absoluteX="-1dp"
-        tools:layout_editor_absoluteY="186dp" />
+        tools:layout_editor_absoluteX="19dp"
+        tools:layout_editor_absoluteY="188dp" />
 
     <TextView
         android:id="@+id/text_dashboard"
@@ -42,15 +42,15 @@
 
     <Button
         android:id="@+id/button2"
-        android:layout_width="404dp"
-        android:layout_height="57dp"
+        android:layout_width="356dp"
+        android:layout_height="49dp"
         android:text="Take Picture of Food Item"
-        tools:layout_editor_absoluteX="3dp"
-        tools:layout_editor_absoluteY="72dp" />
+        tools:layout_editor_absoluteX="21dp"
+        tools:layout_editor_absoluteY="69dp" />
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/cameraButton" />
+        android:layout_below="@id/button2" />
 </androidx.constraintlayout.widget.ConstraintLayout>
