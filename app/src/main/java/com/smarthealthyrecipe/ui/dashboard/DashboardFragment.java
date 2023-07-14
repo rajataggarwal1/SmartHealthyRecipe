@@ -21,36 +21,15 @@ import androidx.lifecycle.ViewModelProvider;
 import com.smarthealthyrecipe.R;
 import com.smarthealthyrecipe.databinding.FragmentDashboardBinding;
 
-public class DashboardFragment extends Fragment {
+public class DashboardFragment extends Fragment implements View.OnClickListener {
 
     private FragmentDashboardBinding binding;
+    private ActivityResultLauncher<Intent> cameraLauncher;
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        DashboardViewModel dashboardViewModel =
-                new ViewModelProvider(this).get(DashboardViewModel.class);
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-        binding = FragmentDashboardBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
-
-        // Access the buttons directly from the binding
-        binding.uploadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Handle upload button click
-            }
-        });
-
-        binding.enterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Handle enter button click
-            }
-        });
-
-        final int CAMERA_REQUEST_CODE = 123;
-        ActivityResultLauncher<Intent> cameraLauncher;
-        ImageView imageView = requireView().findViewById(R.id.imageView);
         cameraLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -61,24 +40,31 @@ public class DashboardFragment extends Fragment {
                         Bundle extras = data.getExtras();
                         Bitmap photoBitmap = (Bitmap) extras.get("data");
                         // Do something with the photo
+                        ImageView imageView = requireView().findViewById(R.id.imageView);
                         imageView.setImageBitmap(photoBitmap);
                     }
                 }
         );
+    }
 
-        Button cameraButton =  requireView().findViewById(R.id.takePictureButton);
-        cameraButton.setOnClickListener(v -> {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentDashboardBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
+
+        binding.takePictureButton.setOnClickListener(this);
+
+        return root;
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.takePictureButton) {
             Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             if (cameraIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
                 cameraLauncher.launch(cameraIntent);
             }
-        });
-
-
-
-        final TextView textView = binding.textDashboard;
-        dashboardViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-        return root;
+        }
     }
 
     @Override
