@@ -1,6 +1,8 @@
 package com.smarthealthyrecipe.ui.dashboard;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -10,8 +12,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -21,11 +25,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.smarthealthyrecipe.R;
 import com.smarthealthyrecipe.databinding.FragmentDashboardBinding;
-
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.widget.EditText;
-import android.widget.Toast;
 
 public class DashboardFragment extends Fragment implements View.OnClickListener {
 
@@ -55,50 +54,16 @@ public class DashboardFragment extends Fragment implements View.OnClickListener 
         );
     }
 
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//        binding = FragmentDashboardBinding.inflate(inflater, container, false);
-//        View root = binding.getRoot();
-//
-//        binding.takePictureButton.setOnClickListener(this);
-//
-//        return root;
-//    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_dashboard, container, false);
+        binding = FragmentDashboardBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
 
-        Button button = rootView.findViewById(R.id.enterButton);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Dialog code goes here
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle("Enter Text");
+        binding.takePictureButton.setOnClickListener(this);
+        binding.enterButton.setOnClickListener(this);
 
-                // Inflate the custom layout for the EditText
-                View view = getLayoutInflater().inflate(R.layout.dialog_edit_text, null);
-                final EditText editText = view.findViewById(R.id.editText);
-                builder.setView(view);
-
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String enteredText = editText.getText().toString();
-                        Toast.makeText(getActivity(), "Entered Text: " + enteredText, Toast.LENGTH_SHORT).show();
-                    }
-                });
-                builder.setNegativeButton("Cancel", null);
-
-                AlertDialog dialog = builder.create();
-                dialog.show();
-            }
-        });
-
-        return rootView;
+        return root;
     }
-
-
 
     @Override
     public void onClick(View view) {
@@ -110,6 +75,31 @@ public class DashboardFragment extends Fragment implements View.OnClickListener 
                 cameraLauncher.launch(cameraIntent);
                 Log.d("DashboardFragment", "takePictureButton clicked -- after Camera Launcher");
             }
+        }
+        else if(view.getId() == R.id.enterButton){
+            // Dialog code goes here
+            Log.d("DashboardFragment", "enterButton");
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Enter Text");
+
+            // Inflate the custom layout for the EditText
+            View editView = getLayoutInflater().inflate(R.layout.dialog_edit_text, null);
+            final EditText editText = editView.findViewById(R.id.editText);
+            builder.setView(editView);
+
+            Log.d("DashboardFragment", "enterButton-2");
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String enteredText = editText.getText().toString();
+                    Log.d("DashboardFragment", "enterButton  text" + enteredText);
+                    Toast.makeText(getActivity(), "Entered Text: " + enteredText, Toast.LENGTH_SHORT).show();
+                }
+            });
+            builder.setNegativeButton("Cancel", null);
+            Log.d("DashboardFragment", "enterButton  after" );
+            AlertDialog dialog = builder.create();
+            dialog.show();
         }
 //        AlertDialog.Builder builder = new AlertDialog.Builder(DashboardFragment.this);
 //        builder.setTitle("Enter Text");
@@ -134,7 +124,6 @@ public class DashboardFragment extends Fragment implements View.OnClickListener 
 //        AlertDialog dialog = builder.create();
 //        dialog.show();
     }
-
 
     @Override
     public void onDestroyView() {
