@@ -74,5 +74,27 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-<!--    </ConstraintLayout>-->
+
+    <!-- fragment_dashboard.xml -->
+    <!-- fragment_dashboard.xml -->
+    <!-- fragment_dashboard.xml -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Add other views specific to your dashboard layout -->
+
+        <TextView
+            android:id="@+id/displayTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:text=""
+            android:textSize="16sp" />
+
+    </RelativeLayout>
+
+
+    <!--    </ConstraintLayout>-->
 </androidx.constraintlayout.widget.ConstraintLayout>

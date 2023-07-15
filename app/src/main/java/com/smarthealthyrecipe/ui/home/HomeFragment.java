@@ -1,37 +1,72 @@
 package com.smarthealthyrecipe.ui.home;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
-import com.smarthealthyrecipe.databinding.FragmentHomeBinding;
+import com.smarthealthyrecipe.R;
+import com.smarthealthyrecipe.ui.dashboard.DashboardFragment;
 
-public class HomeFragment extends Fragment {
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-    private FragmentHomeBinding binding;
+public class HomeFragment extends Fragment implements DashboardFragment.OnItemAddedListener {
+    private static final String PREF_NAME = "ItemPrefs";
+    private static final String KEY_ITEM_SET = "itemSet";
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        HomeViewModel homeViewModel =
-                new ViewModelProvider(this).get(HomeViewModel.class);
+    private SharedPreferences sharedPreferences;
+    private Set<String> itemSet;
+    private List<String> itemList;
+    private ArrayAdapter<String> adapter;
+    private ListView listView;
 
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        sharedPreferences = requireContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        itemSet = sharedPreferences.getStringSet(KEY_ITEM_SET, new HashSet<>());
+        itemList = new ArrayList<>(itemSet);
+        adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, itemList);
+    }
 
-        final TextView textView = binding.textHome;
-        homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-        return root;
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_home, container, false);
+
+        listView = rootView.findViewById(R.id.listView);
+        listView.setAdapter(adapter);
+
+        return rootView;
+    }
+
+    public void updateItemList(String newItem) {
+        itemSet.add(newItem);
+        itemList.add(newItem);
+        adapter.notifyDataSetChanged();
+        saveItemsToSharedPreferences();
+    }
+
+    private void saveItemsToSharedPreferences() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putStringSet(KEY_ITEM_SET, itemSet).apply();
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
+    public void onItemAdded(String item) {
+        itemList.add(item);
+        adapter.notifyDataSetChanged();
     }
 }
+
