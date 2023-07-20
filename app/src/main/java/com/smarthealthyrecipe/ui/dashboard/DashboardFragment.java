@@ -30,12 +30,15 @@ import androidx.fragment.app.Fragment;
 
 import com.smarthealthyrecipe.MainActivity;
 import com.smarthealthyrecipe.R;
+import com.smarthealthyrecipe.SharedViewModel;
 import com.smarthealthyrecipe.databinding.FragmentDashboardBinding;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class DashboardFragment extends Fragment implements View.OnClickListener {
+
+    private SharedViewModel sharedViewModel;
 
     private FragmentDashboardBinding binding;
     private ActivityResultLauncher<Intent> cameraLauncher;
@@ -57,6 +60,8 @@ public class DashboardFragment extends Fragment implements View.OnClickListener 
         sharedPreferences = requireContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         itemSet = sharedPreferences.getStringSet(KEY_ITEM_SET, new HashSet<>());
 
+        sharedViewModel = ((MainActivity) requireActivity()).getSharedViewModel();
+
         cameraLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -74,6 +79,10 @@ public class DashboardFragment extends Fragment implements View.OnClickListener 
                 }
         );
 
+    }
+
+    private void onUserTextInput(String text) {
+        sharedViewModel.setInputData(text);
     }
     @Nullable
     @Override

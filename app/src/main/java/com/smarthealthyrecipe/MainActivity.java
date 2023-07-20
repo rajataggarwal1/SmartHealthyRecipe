@@ -3,6 +3,7 @@ package com.smarthealthyrecipe;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -12,18 +13,24 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.smarthealthyrecipe.databinding.ActivityMainBinding;
 import com.smarthealthyrecipe.ui.dashboard.DashboardFragment;
 import com.smarthealthyrecipe.ui.home.HomeFragment;
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
+import android.os.Bundle;
+import com.smarthealthyrecipe.R;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ActivityMainBinding binding;
+    private SharedViewModel sharedViewModel;
+    private NavController navController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        com.smarthealthyrecipe.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
@@ -36,13 +43,24 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
 
-        setContentView(R.layout.activity_main);
+        // Find the NavHostFragment
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
 
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragmentContainer, new DashboardFragment())
-                    .commit();
-        }
+        // Get the NavController from the NavHostFragment
+        navController = navHostFragment.getNavController();
+
+        setContentView(R.layout.activity_main);
+        sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
+//        if (savedInstanceState == null) {
+//            getSupportFragmentManager().beginTransaction()
+//                    .add(R.id.fragmentContainer, new DashboardFragment())
+//                    .commit();
+//        }
+    }
+
+
+    public SharedViewModel getSharedViewModel() {
+        return sharedViewModel;
     }
 
     public void updateHomeFragment(String newItem) {

@@ -8,6 +8,20 @@
     android:layout_height="match_parent"
     android:paddingTop="?attr/actionBarSize">
 
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/nav_host_fragment"
+            android:name="androidx.navigation.fragment.NavHostFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:defaultNavHost="true"
+            app:navGraph="@navigation/nav_graph" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/nav_view"
         android:layout_width="0dp"
@@ -39,7 +53,7 @@
     </LinearLayout>
 
     <!-- Add the fragment tag for HomeFragment -->
-    <fragment
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/homeFragment"
         android:name="com.smarthealthyrecipe.ui.home.HomeFragment"
         android:layout_width="0dp"
@@ -50,7 +64,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:layout="@layout/fragment_home" />
 
-    <fragment
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment_activity_main"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"

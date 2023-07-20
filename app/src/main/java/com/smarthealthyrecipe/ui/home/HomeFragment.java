@@ -8,12 +8,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.smarthealthyrecipe.MainActivity;
 import com.smarthealthyrecipe.R;
+import com.smarthealthyrecipe.SharedViewModel;
 import com.smarthealthyrecipe.ui.dashboard.DashboardFragment;
 
 import java.util.ArrayList;
@@ -21,7 +24,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import androidx.lifecycle.Observer;
+
+
 public class HomeFragment extends Fragment implements DashboardFragment.OnItemAddedListener {
+
+    private SharedViewModel sharedViewModel;
     private static final String PREF_NAME = "ItemPrefs";
     private static final String KEY_ITEM_SET = "itemSet";
 
@@ -38,15 +46,35 @@ public class HomeFragment extends Fragment implements DashboardFragment.OnItemAd
         itemSet = sharedPreferences.getStringSet(KEY_ITEM_SET, new HashSet<>());
         itemList = new ArrayList<>(itemSet);
         adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, itemList);
+
+        sharedViewModel = ((MainActivity) requireActivity()).getSharedViewModel();
     }
 
-    @Nullable
+//    @Nullable
+//    @Override
+//    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+//        View rootView = inflater.inflate(R.layout.fragment_home, container, false);
+//
+//        listView = rootView.findViewById(R.id.listView);
+//        listView.setAdapter(adapter);
+//
+//        return rootView;
+//    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
-        listView = rootView.findViewById(R.id.listView);
-        listView.setAdapter(adapter);
+        // Observe changes in the data and update the UI
+        sharedViewModel.getInputData().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String text) {
+                // Update the UI with the text from the DashboardFragment
+                // For example, update a TextView with the received text
+                TextView textView = rootView.findViewById(R.id.textView);
+                textView.setText(text);
+            }
+        });
 
         return rootView;
     }
