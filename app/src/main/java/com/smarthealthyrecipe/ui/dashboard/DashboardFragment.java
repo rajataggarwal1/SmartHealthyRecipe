@@ -3,8 +3,10 @@ package com.smarthealthyrecipe.ui.dashboard;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -21,24 +23,44 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
+import com.smarthealthyrecipe.MainActivity;
 import com.smarthealthyrecipe.R;
+import com.smarthealthyrecipe.SharedViewModel;
 import com.smarthealthyrecipe.databinding.FragmentDashboardBinding;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class DashboardFragment extends Fragment implements View.OnClickListener {
 
+    private SharedViewModel sharedViewModel;
+
     private FragmentDashboardBinding binding;
     private ActivityResultLauncher<Intent> cameraLauncher;
+    private static final String PREF_NAME = "ItemPrefs";
+    private static final String KEY_ITEM_SET = "itemSet";
+
+    private SharedPreferences sharedPreferences;
+    private Set<String> itemSet;
+    private OnItemAddedListener itemAddedListener;
 
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 1001;
+
+    public DashboardFragment() {
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sharedPreferences = requireContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        itemSet = sharedPreferences.getStringSet(KEY_ITEM_SET, new HashSet<>());
+
+        sharedViewModel = ((MainActivity) requireActivity()).getSharedViewModel();
 
         cameraLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -56,17 +78,50 @@ public class DashboardFragment extends Fragment implements View.OnClickListener 
                     }
                 }
         );
+
     }
 
+    private void onUserTextInput(String text) {
+        sharedViewModel.setInputData(text);
+    }
+    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentDashboardBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
+        View rootView = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
-        binding.takePictureButton.setOnClickListener(this);
-        binding.enterButton.setOnClickListener(this);
+        Button addButton = rootView.findViewById(R.id.enterButton);
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openDialog();
+            }
+        });
 
-        return root;
+        return rootView;
+    }
+
+    private void openDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Enter Item");
+
+        final EditText editText = new EditText(requireContext());
+        builder.setView(editText);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String enteredItem = editText.getText().toString();
+                if (!enteredItem.isEmpty()) {
+                    addItem(enteredItem);
+                    Toast.makeText(requireContext(), "Item added!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(requireContext(), "Please enter an item.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
     }
 
     @Override
@@ -79,29 +134,32 @@ public class DashboardFragment extends Fragment implements View.OnClickListener 
             } else {
                 Log.d("DashboardFragment", " Does not have camera permission");
                 requestCameraPermission();
-            }
-        } else if (view.getId() == R.id.enterButton) {
-            // Dialog code goes here
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("Enter Text");
-
-            // Inflate the custom layout for the EditText
-            View editView = getLayoutInflater().inflate(R.layout.dialog_edit_text, null);
-            final EditText editText = editView.findViewById(R.id.editText);
-            builder.setView(editView);
-
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    String enteredText = editText.getText().toString();
-                    Toast.makeText(getActivity(), "Entered Text: " + enteredText, Toast.LENGTH_SHORT).show();
-                }
-            });
-            builder.setNegativeButton("Cancel", null);
-
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            }}
+//        } else if (view.getId() == R.id.enterButton) {
+//            // Dialog code goes here
+//        }
+    }
+    private void addItem(String item) {
+        itemSet.add(item);
+        saveItemsToSharedPreferences();
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).updateHomeFragment(item);
         }
+    }
+
+    private void saveItemsToSharedPreferences() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putStringSet(KEY_ITEM_SET, itemSet).apply();
+    }
+
+    // Interface to communicate with HomeFragment
+    public interface OnItemAddedListener {
+        void onItemAdded(String item);
+    }
+
+    // Method to set the itemAddedListener from HomeFragment
+    public void setOnItemAddedListener(OnItemAddedListener listener) {
+        itemAddedListener = listener;
     }
 
     private boolean hasCameraPermission() {
