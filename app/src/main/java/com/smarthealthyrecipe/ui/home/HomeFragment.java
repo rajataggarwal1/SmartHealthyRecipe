@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 
 public class HomeFragment extends Fragment implements DashboardFragment.OnItemAddedListener {
@@ -37,7 +38,7 @@ public class HomeFragment extends Fragment implements DashboardFragment.OnItemAd
     private Set<String> itemSet;
     private List<String> itemList;
     private ArrayAdapter<String> adapter;
-    private ListView listView;
+    private ListView listView; // Declare listView here
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,24 +48,18 @@ public class HomeFragment extends Fragment implements DashboardFragment.OnItemAd
         itemList = new ArrayList<>(itemSet);
         adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, itemList);
 
-        sharedViewModel = ((MainActivity) requireActivity()).getSharedViewModel();
+        // Note: The sharedViewModel assignment is removed from here
     }
 
-//    @Nullable
-//    @Override
-//    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-//        View rootView = inflater.inflate(R.layout.fragment_home, container, false);
-//
-//        listView = rootView.findViewById(R.id.listView);
-//        listView.setAdapter(adapter);
-//
-//        return rootView;
-//    }
-
+    @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
+        listView = rootView.findViewById(R.id.listView); // Initialize listView here
+        listView.setAdapter(adapter);
+
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
         // Observe changes in the data and update the UI
         sharedViewModel.getInputData().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
@@ -95,6 +90,11 @@ public class HomeFragment extends Fragment implements DashboardFragment.OnItemAd
     public void onItemAdded(String item) {
         itemList.add(item);
         adapter.notifyDataSetChanged();
+    }
+
+    // Method to set the SharedViewModel from MainActivity
+    public void setSharedViewModel(SharedViewModel viewModel) {
+        sharedViewModel = viewModel;
     }
 }
 

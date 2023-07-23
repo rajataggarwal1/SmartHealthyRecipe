@@ -1,7 +1,6 @@
 package com.smarthealthyrecipe.ui.dashboard;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -27,6 +26,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.smarthealthyrecipe.MainActivity;
 import com.smarthealthyrecipe.R;
@@ -37,8 +37,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class DashboardFragment extends Fragment implements View.OnClickListener {
-
-    private SharedViewModel sharedViewModel;
 
     private FragmentDashboardBinding binding;
     private ActivityResultLauncher<Intent> cameraLauncher;
@@ -60,13 +58,10 @@ public class DashboardFragment extends Fragment implements View.OnClickListener 
         sharedPreferences = requireContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         itemSet = sharedPreferences.getStringSet(KEY_ITEM_SET, new HashSet<>());
 
-        sharedViewModel = ((MainActivity) requireActivity()).getSharedViewModel();
-
         cameraLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    Log.d("DashboardFragment", "in launcher");
-                    if (result.getResultCode() == Activity.RESULT_OK) {
+                    if (result.getResultCode() == MainActivity.RESULT_OK) {
                         // Photo was taken successfully
                         Intent data = result.getData();
                         // Process the photo data
@@ -78,12 +73,8 @@ public class DashboardFragment extends Fragment implements View.OnClickListener 
                     }
                 }
         );
-
     }
 
-    private void onUserTextInput(String text) {
-        sharedViewModel.setInputData(text);
-    }
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -127,23 +118,19 @@ public class DashboardFragment extends Fragment implements View.OnClickListener 
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.takePictureButton) {
-            Log.d("DashboardFragment", "takePictureButton clicked");
             if (hasCameraPermission()) {
-                Log.d("DashboardFragment", " has camera permission");
                 launchCamera();
             } else {
-                Log.d("DashboardFragment", " Does not have camera permission");
                 requestCameraPermission();
-            }}
-//        } else if (view.getId() == R.id.enterButton) {
-//            // Dialog code goes here
-//        }
+            }
+        }
     }
+
     private void addItem(String item) {
         itemSet.add(item);
         saveItemsToSharedPreferences();
-        if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).updateHomeFragment(item);
+        if (itemAddedListener != null) {
+            itemAddedListener.onItemAdded(item);
         }
     }
 
@@ -172,13 +159,9 @@ public class DashboardFragment extends Fragment implements View.OnClickListener 
 
     private void launchCamera() {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        Log.d("cameraIntent", " cameraIntent " + cameraIntent);
-//        cameraLauncher.launch(cameraIntent);
         if (cameraIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
             cameraLauncher.launch(cameraIntent);
-        }
-        else{
-            Log.d("cameraIntent", " in else " );
+        } else {
             Toast.makeText(requireContext(), "No camera app found on the device", Toast.LENGTH_SHORT).show();
         }
     }
